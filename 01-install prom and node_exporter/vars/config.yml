@@ -1,3 +1,5 @@
+---
+
 prom_dir: /opt/prometheus
 prom_port: 9090
 prom_db_dir: /var/lib/prometheus/data
