@@ -14,6 +14,7 @@
       name: 'monitoring'
       shell: '/sbin/nologin'
       home: '{{ prom_dir }}'
+    ignore_errors: yes
     tags: user
 
   - name: "Create directory for Prometheus"
@@ -43,18 +44,19 @@
   - name: "Extract Prometheus files"
     unarchive:
       src: /tmp/prometheus-2.30.3.linux-amd64.tar.gz
-      dest: /tmp/
+      dest: '{{ prom_temp }}'
+      extra_opts: [--strip-components=1]
     tags: untar
 
   - name: "Install Prometheus"
     shell: | 
-      mv /tmp/prometheus-2.30.3.linux-amd64/* '{{ prom_temp }}' && cd '{{ prom_temp }}' && chown -R monitoring:monitoring ./*
+      cd '{{ prom_temp }}' && chown -R monitoring:monitoring ./*
       cp '{{ prom_temp }}'/prometheus '{{ prom_dir }}' && cp -R '{{ prom_temp }}'/console_libraries/* '{{ prom_dir }}'/console_libraries && cp -R '{{ prom_temp }}'/consoles/* '{{ prom_dir }}'/consoles
     tags: install
 
   - name: "Copy Prometheus conf"
     template:
-      src: 'prometheus.yml'
+      src: 'prometheus.yml.j2'
       dest: '{{ prom_dir }}/prometheus.yml'
       owner: 'monitoring'
       group: 'monitoring'
@@ -64,7 +66,7 @@
   - name: "Copy Prometheus systemd-unit"
     template:
       src: 'systemd-unit.yml.j2'
-      dest: '/lib/systemd/system/prometheus.service'
+      dest: '/etc/systemd/system/prometheus.service'
       owner: 'monitoring'
       group: 'monitoring'
       mode: '0644'

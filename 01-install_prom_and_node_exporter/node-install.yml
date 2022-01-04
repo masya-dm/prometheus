@@ -51,7 +51,7 @@
 
   - name: "Copy Node_Exporter systemd-unit"
     template:
-      src: 'systemd-unit-node.yml'
+      src: 'systemd-unit-node.yml.j2'
       dest: '/lib/systemd/system/node_exporter.service'
       owner: 'monitoring'
       group: 'monitoring'

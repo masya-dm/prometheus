@@ -1,0 +1,4 @@
+[test]
+localhost
+rebrain-01 ansible_host=159.89.11.170 ansible_user=user ansible_password=xymxbunnjqls
+
