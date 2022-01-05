@@ -1,0 +1,18 @@
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=monitoring
+Group=monitoring
+ExecStart="{{ push_dir }}/pushgateway" \
+    --web.listen-address="0.0.0.0:{{ push_port }}" \
+    --web.telemetry-path="/metrics" \
+    --web.enable-lifecycle \
+    --web.enable-admin-api \
+    --persistence.file="{{ push_dir }}/push.metrics" \
+    --persistence.interval=5m
+
+[Install]
+WantedBy=default.target

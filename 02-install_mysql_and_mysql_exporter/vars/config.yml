@@ -3,7 +3,8 @@
 prom_dir: /opt/prometheus
 prom_port: 9090
 prom_db_dir: /var/lib/prometheus/data
-prom_temp: /tmp/prom
+prom_temp: /tmp/prom/prometheus-2.30.3.linux-amd64
+prom_data: /opt/prometheus/data
 
 mysqld_dir: /opt/mysqld_exporter
 mysqld_port: 9111

@@ -16,54 +16,19 @@
       home: '{{ mysqld_dir }}'
     tags: user
 
-  - name: "Install mysql-server and gcc"
-    apt:
-      name: 'mysql-server,gcc,cc-tool,make'
-      update_cache: 'yes'
-      state: 'present'
-    tags: install
-
-  - name: "Download GO"
-    get_url:
-      url: "https://golang.org/dl/go1.17.2.linux-amd64.tar.gz"
-      dest: /tmp/
+  - name: "Install mysqld_exporter"
+    copy:
+      src: ./files/mysqld_exporter
+      dest: /opt/mysqld_exporter/
+      directory_mode: yes
       owner: 'monitoring'
       group: 'monitoring'
-      mode: 0755
-    tags: wget_go
-
-  - name: "Install GO"
-    shell: |
-      echo "PATH=$PATH:/usr/local/go/bin" >> /etc/profile && source /etc/profile
-      cd /tmp/ && rm -rf /usr/local/go && tar -C /usr/local -xzf ./go1.17.2.linux-amd64.tar.gz
-    tags: install_go
-    ignore_errors: yes
-
-  - name: "Download Mysql_Exporter"
-    git:
-      repo: "https://github.com/prometheus/mysqld_exporter.git"
-      dest: "/tmp/mysqld_exporter/"
-      version: master
-      clone: yes
-    tags: git_exporter
-
-  - name: "Build"
-    shell: |
-      cd /tmp/mysqld_exporter/ && export PATH=$PATH:/usr/local/go/bin && make
-    register: loginoutput
-    failed_when: false
-    no_log: True
-    ignore_errors: yes
-    tags: build 
-
-  - name: "Install mysqld_exporter"
-    shell: |
-      mkdir -p /opt/mysqld_exporter/ && cp /tmp/mysqld_exporter/mysqld_exporter /opt/mysqld_exporter/
-      
+      mode: '0644'
+    tags: copy_d
 
   - name: "Copy Mysqld_Exporter systemd-unit"
     template:
-      src: 'systemd-unit-node.yml.j2'
+      src: 'systemd-unit-mysqld_exporter.yml.j2'
       dest: '/etc/systemd/system/mysqld_exporter.service'
       owner: 'monitoring'
       group: 'monitoring'

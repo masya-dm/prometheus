@@ -9,12 +9,12 @@
       dir: vars/
     tags: include
 
-  - name: "Create user for Node_Exporter"
-    user:
-      name: 'monitoring'
-      shell: '/sbin/nologin'
-      home: '{{ node_dir }}'
-    tags: user
+#  - name: "Create user for Node_Exporter"
+#    user:
+#      name: 'monitoring'
+#      shell: '/sbin/nologin'
+#      home: '{{ node_dir }}'
+#    tags: user
 
   - name: "Create directory for Node_Exporter"
     file:
@@ -38,9 +38,8 @@
     tags: wget
 
   - name: "Extract Node_Exporter files"
-    unarchive:
-      src: /tmp/node_exporter-1.2.2.linux-amd64.tar.gz
-      dest: /tmp/
+    shell: |
+      tar -xzpf /tmp/node_exporter-1.2.2.linux-amd64.tar.gz -C /tmp/
     tags: untar
 
   - name: "Install Node_Exporter"
