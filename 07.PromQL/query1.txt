@@ -1,0 +1,1 @@
+(sum by (instance)(irate(node_cpu_seconds_total{mode="user"}[1m]))/sum by (instance)(irate(node_cpu_seconds_total[1m])))*100

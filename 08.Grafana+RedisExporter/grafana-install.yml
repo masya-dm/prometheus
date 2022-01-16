@@ -1,0 +1,48 @@
+---
+- name: "Install and configure Grafana"
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: "Include vars"
+    include_vars:
+      dir: vars/
+    tags: include
+
+  - name: "Istall Req Package"
+    apt:
+      update_cache: yes
+      name: "{{ item }}"
+      state: present
+    with_items:
+       - apt-transport-https
+       - software-properties-common 
+       - wget
+
+  - name: "Install Grafana Repo"
+    shell: |
+      wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+      echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+    tags: grafana-install
+
+  - name: "Install Grafana server"
+    apt:
+      update_cache: yes
+      name: "grafana"
+    tags: grafana-install
+    
+  - name: "Set Admin passwd"
+    lineinfile:
+      path: /etc/grafana/grafana.ini
+      regexp: 'admin_password = admin'
+      line: 'admin_password = {{ admin_pass }}'
+    tags: grafana-install
+
+  - name: "Reload systemd and start Grafana "
+    systemd:
+      daemon_reload: yes
+      enabled: yes
+      masked: no
+      state: reloaded
+      name: 'grafana-server.service'
+    tags: systemd

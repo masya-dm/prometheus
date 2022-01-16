@@ -1,0 +1,17 @@
+wget https://github.com/prometheus/pushgateway/releases/download/v1.4.0/pushgateway-1.4.0.linux-amd64.tar.gz
+
+tar zxf pushgateway-1.4.0.linux-amd64.tar.gz
+
+mv pushgateway-1.4.0.linux-amd64 pushgateway
+
+
+
+echo 'time_run{type="gauge"} 3.14' | curl --data-binary @- http://localhost:9991/metrics/job/test1/instance/app1
+
+echo 'time_run{type="gauge"} 6.18' | curl --data-binary @- http://localhost:9991/metrics/job/test1/instance/app2
+
+
+  - job_name: 'pushgateway'
+    honor_labels: true ----> Так вот данная опция honor_labels: true запрещает Prometheus заменять данные теги своими собственными, а требует использовать те, которые были указаны в pushgateway.
+    static_configs:
+    - targets: ['localhost:9991']

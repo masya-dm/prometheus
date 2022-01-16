@@ -1,4 +1,0 @@
-[test]
-localhost
-rebrain-01 ansible_host=159.223.28.139 ansible_user=user ansible_password=wlwrhbfwmfxw
-vm-00.masya.lan

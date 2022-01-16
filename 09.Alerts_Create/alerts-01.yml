@@ -1,0 +1,13 @@
+groups:
+- name: instances
+  interval: 1s
+  rules:
+  - alert: CompactionTimeTooLong
+    expr: histogram_quantile(0.95, rate(prometheus_tsdb_compaction_duration_seconds_bucket[100m])) >= 0.9
+    for: 1m
+    labels:
+      severity: warning
+      env: dev
+      labelscount: "{{ len $labels }}"
+    annotations:
+      summary: "Comaction time on {{ $labels.instance }} equals {{ $value }}"

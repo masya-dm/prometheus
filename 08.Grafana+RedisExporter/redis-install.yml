@@ -1,0 +1,61 @@
+---
+- name: "Install and configure Redis + Redis_Exporter"
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: "Include vars"
+    include_vars:
+      dir: vars/
+    tags: include
+
+  - name: "Create user for Redis_Exporter"
+    user:
+      name: 'monitoring'
+      shell: '/sbin/nologin'
+      home: "{{ redis_dir }}"
+    tags: user
+
+  - name: "Install Redis-server"
+    apt:
+      name: "redis-server"
+      state: present
+      update_cache: yes
+    tags: redis-install
+
+  - name: "Start Redis-server"
+    systemd:
+      name: "redis-server"
+      daemon_reload: yes
+      enabled: yes
+      state: started
+
+  - name: "Install Redis_exporter"
+    copy:
+      src: ./files/redis_exporter
+      dest: "{{ redis_dir }}"
+      directory_mode: yes
+      owner: 'monitoring'
+      group: 'monitoring'
+      mode: '0755'
+    tags: copy_d
+
+  - name: "Copy Redis_exporter systemd-unit"
+    template:
+      src: 'systemd-unit-redis_exporter.yml.j2'
+      dest: '/etc/systemd/system/redis_exporter.service'
+      owner: 'monitoring'
+      group: 'monitoring'
+      mode: '0644'
+      backup: 'yes'
+    tags: copy
+
+
+  - name: "Reload systemd and start "
+    systemd:
+      daemon_reload: yes
+      enabled: yes
+      masked: no
+      state: started
+      name: 'redis_exporter.service'
+    tags: systemd

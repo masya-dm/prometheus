@@ -1,0 +1,17 @@
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=monitoring
+Group=monitoring
+ExecStart="{{ prom_dir }}/prometheus" \
+    --config.file="{{ prom_dir }}/prometheus.yml" \
+    --storage.tsdb.path="{{ prom_db_dir }}"\
+    --web.console.templates="{{ prom_dir }}/consoles" \
+    --web.console.libraries="{{ prom_dir }}/console_libraries" \
+    --web.listen-address="0.0.0.0:{{ prom_port }}"
+
+[Install]
+WantedBy=default.target

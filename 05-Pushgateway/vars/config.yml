@@ -1,4 +1,0 @@
----
-push_temp: /tmp/
-push_dir: /opt/pushgateway
-push_port: 9991

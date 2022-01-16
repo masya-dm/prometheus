@@ -1,8 +1,0 @@
-prom_dir: /opt/prometheus
-prom_port: 9090
-prom_db_dir: /var/lib/prometheus/data
-prom_temp: /tmp/prom
-
-node_dir: /opt/node_exporter
-node_port: 9100
-node_temp: /tmp/node

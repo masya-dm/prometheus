@@ -1,0 +1,68 @@
+---
+- name: "Install and configure Node_Exporter"
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: "Include vars"
+    include_vars:
+      dir: vars/
+    tags: include
+
+  - name: "Create user for Node_Exporter"
+    user:
+      name: 'monitoring'
+      shell: '/sbin/nologin'
+      home: '{{ node_dir }}'
+    tags: user
+
+  - name: "Create directory for Node_Exporter"
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: 'monitoring'
+      group: 'monitoring'
+      mode: '0755'
+    with_items:
+        - '{{ node_dir }}'
+        - '{{ node_temp }}'
+    tags: mkdir
+
+  - name: "Download Node_Exporter"
+    get_url:
+      url: https://github.com/prometheus/node_exporter/releases/download/v1.2.2/node_exporter-1.2.2.linux-amd64.tar.gz
+      dest: /tmp/
+      owner: 'monitoring'
+      group: 'monitoring'
+      mode: 0755
+    tags: wget
+
+  - name: "Extract Node_Exporter files"
+    shell: |
+      tar -xzpf /tmp/node_exporter-1.2.2.linux-amd64.tar.gz -C /tmp/
+    tags: untar
+
+  - name: "Install Node_Exporter"
+    shell: | 
+      mv /tmp/node_exporter-1.2.2.linux-amd64/* '{{ node_temp }}' && cd '{{ node_temp }}' && chown -R monitoring:monitoring ./*
+      cp '{{ node_temp }}'/node_exporter '{{ node_dir }}'
+    tags: install
+
+  - name: "Copy Node_Exporter systemd-unit"
+    template:
+      src: 'systemd-unit-node.yml.j2'
+      dest: '/lib/systemd/system/node_exporter.service'
+      owner: 'monitoring'
+      group: 'monitoring'
+      mode: '0755'
+      backup: 'yes'
+    tags: copy
+
+  - name: "Reload systemd and start "
+    systemd:
+      daemon_reload: yes
+      enabled: yes
+      masked: no
+      state: started
+      name: 'node_exporter.service'
+    tags: systemd

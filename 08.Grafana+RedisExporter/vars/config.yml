@@ -1,0 +1,9 @@
+prom_dir: /opt/prometheus
+prom_port: 9090
+prom_db_dir: /var/lib/prometheus/data
+prom_temp: /tmp/prom
+
+redis_dir: /opt/redis_exporter
+redis_port: 9121
+
+admin_pass: secretpassword

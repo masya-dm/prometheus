@@ -1,0 +1,15 @@
+[Unit]
+Description=Redis Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=monitoring
+Group=monitoring
+Type=simple
+ExecStart={{ redis_dir }}/redis_exporter \
+    --web.listen-address="0.0.0.0:{{ redis_port }}" \
+    --web.telemetry-path="/metrics"
+
+[Install]
+WantedBy=multi-user.target
